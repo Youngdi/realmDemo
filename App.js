@@ -106,15 +106,15 @@ export default class RealmModelsDemo extends Component {
     this.b = 1;
   }
   componentDidMount () {
-    console.log(RNFS);
+    Realm.copyBundledRealmFiles();
     this.realm = new Realm({
-      path: RNFS.MainBundlePath + '/byt.realm',
+      path: 'byt.realm',
       schema:[schedule, bible_kjv,bible_japan, bible_cht, bible_chs, Person],
-      readOnly: true,
     });
     console.log(new Date().getTime());
     this.schedule_results = this.realm.objects('schedule').filtered('month = 1 AND day = 1');
     this.bible_results = this.realm.objects('bible_cht');
+    
     const content = this.schedule_results.map(item => {
       return this.bible_results.filtered(`book_nr = ${item.book_id} AND chapter_nr >= ${item.chapter_from} AND chapter_nr <= ${item.chapter_to} AND verse_nr >= ${item.verse_from} AND verse_nr <= ${item.verse_to == 0 ? 200 : item.verse_to}`);
     });
@@ -137,9 +137,8 @@ export default class RealmModelsDemo extends Component {
         book_nr: 100,
       });
       // Charlie had an excused absense for the second test and was allowed to skip it
-      charlie.book_nr.push(null);
+      charlie.book_nr = 110;
       // And then he didn't do so well on the third test
-      charlie.book_nr.push(110);
     });
     console.log(new Date().getTime());
     this.setState({
@@ -147,11 +146,16 @@ export default class RealmModelsDemo extends Component {
     });
     console.log(new Date().getTime());
   }
+  aaa = () => {
+    const d = this.bible_results.filtered(`book_nr = 110`);
+    alert(d.length);
+  }
   render() {
     return (
       <View style={{marginTop:20}}>
         <Button onPress={() => this.setContent()} title="set"></Button>
         <Button onPress={() => this.setState({content:[]})} title="clear"></Button>
+        <Button onPress={() => this.aaa()} title="aaa"></Button>
         {this.state.content.map(item => {
           return item.map((a, i) => <Text key={i} >{a.verse}</Text>);
         })}
